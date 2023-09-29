@@ -23,7 +23,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.Main</mainClass>
+                            <mainClass>com.vention.TrackLoaderService.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
