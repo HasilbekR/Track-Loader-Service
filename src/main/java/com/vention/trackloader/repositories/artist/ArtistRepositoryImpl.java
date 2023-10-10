@@ -6,7 +6,8 @@ import com.vention.trackloader.utils.Utils;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class ArtistRepositoryImpl implements ArtistRepository {
@@ -19,6 +20,21 @@ public class ArtistRepositoryImpl implements ArtistRepository {
             statement.setString(1, name);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
+                return ResultSetMapper.mapArtist(resultSet);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public Artist getArtistById(UUID id) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(GET_ARTIST_BY_ID);
+            preparedStatement.setObject(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
                 return ResultSetMapper.mapArtist(resultSet);
             }
         } catch (SQLException e) {
@@ -45,8 +61,16 @@ public class ArtistRepositoryImpl implements ArtistRepository {
         preparedStatement.setBoolean(4, isBlocked);
         preparedStatement.setString(5, name);
         preparedStatement.setString(6, url);
-        preparedStatement.setInt(7, Objects.requireNonNullElse(playcount, 0));
-        preparedStatement.setInt(8, Objects.requireNonNullElse(listeners, 0));
+        if(playcount != null){
+            preparedStatement.setInt(7, playcount);
+        }else{
+            preparedStatement.setNull(7,Types.INTEGER);
+        }
+        if(listeners != null){
+            preparedStatement.setInt(8, listeners);
+        }else {
+            preparedStatement.setNull(8, Types.INTEGER);
+        }
         return preparedStatement;
     }
 
@@ -55,6 +79,21 @@ public class ArtistRepositoryImpl implements ArtistRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL);
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Artist> getAll() {
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Artist> artists = new LinkedList<>();
+            while (resultSet.next()) {
+                artists.add(ResultSetMapper.mapArtist(resultSet));
+            }
+            return artists;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -9,8 +9,10 @@ public class DatabaseUtils {
     private static final TrackRepository trackRepository = new TrackRepositoryImpl();
     private static final ArtistRepository artistRepository = new ArtistRepositoryImpl();
 
-    public static void clearDatabase() {
-        trackRepository.deleteAll();
+    public static void clearArtistTable() {
         artistRepository.deleteAll();
+    }
+    public static void clearTrackTable() {
+        trackRepository.deleteAll();
     }
 }

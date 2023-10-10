@@ -1,6 +1,7 @@
 package com.vention.trackloader.servlets;
 
 import com.vention.trackloader.services.TrackService;
+import com.vention.trackloader.utils.Utils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,10 @@ public class TopTracksServlet extends HttpServlet {
         String service = req.getHeader("service");
         if(!Objects.equals(service, "main")) throw new AccessDeniedException("Unavailable service" );
         String page = req.getParameter("page");
-        resp.getWriter().print(trackService.saveTopTracks(page));
+        if(Utils.getRefresh()){
+            resp.getWriter().print(trackService.getTopTracks());
+        }else {
+            resp.getWriter().print(trackService.saveTopTracks(page));
+        }
     }
 }

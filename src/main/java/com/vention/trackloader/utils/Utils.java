@@ -57,4 +57,16 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+    public static Boolean getRefresh(){
+        try {
+            Properties properties = new Properties();
+            InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("application.properties");
+            properties.load(inputStream);
+
+            String refreshData = properties.getProperty("REFRESH_DATA");
+            return Boolean.valueOf(refreshData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

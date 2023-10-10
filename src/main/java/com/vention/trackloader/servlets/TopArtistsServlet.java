@@ -1,6 +1,7 @@
 package com.vention.trackloader.servlets;
 
 import com.vention.trackloader.services.ArtistService;
+import com.vention.trackloader.utils.Utils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,10 @@ public class TopArtistsServlet extends HttpServlet {
         String service = req.getHeader("service");
         if(!Objects.equals(service, "main")) throw new AccessDeniedException("Unavailable service" );
         String page = req.getParameter("page");
-        resp.getWriter().print(artistService.saveTopArtists(page));
+        if(Utils.getRefresh()){
+            resp.getWriter().print(artistService.getTopArtists());
+        }else {
+            resp.getWriter().print(artistService.saveTopArtists(page));
+        }
     }
 }

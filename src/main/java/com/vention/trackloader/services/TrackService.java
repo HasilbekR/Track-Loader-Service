@@ -42,8 +42,16 @@ public class TrackService {
         }
         return tracks;
     }
+
+    /**
+     * Despite clearing this table from artist service, I have to call it here too
+     * as when the request comes from main service it calls directly this method
+     * @param page-
+     * @return writes tracks in json format
+     * @throws IOException -
+     */
     public String saveTopTracks(String page) throws IOException {
-        DatabaseUtils.clearDatabase();
+        DatabaseUtils.clearTrackTable();
         String apiUrl = Utils.getUrl()+"&method=chart.gettoptracks&page="+page;
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -60,8 +68,11 @@ public class TrackService {
         }
         return null;
     }
-    public String saveTopTracksByArtist(String artist, String page) throws IOException {
-        DatabaseUtils.clearDatabase();
+    public String getTopTracks() throws IOException {
+        List<Track> tracks = trackRepository.getAll();
+        return objectMapper.writeValueAsString(tracks);
+    }
+    public String getTopTracksByArtist(String artist, String page) throws IOException {
         String encodedArtist = URLEncoder.encode(artist, StandardCharsets.UTF_8);
         String apiUrl = Utils.getUrl()+"&method=artist.gettoptracks"+"&artist="+encodedArtist+"&page="+page;
         URL url = new URL(apiUrl);
@@ -73,8 +84,7 @@ public class TrackService {
             try(BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
                 List<Track> trackList = trackWrapper.getToptracks().getTrack();
-                List<Track> savedTracks = saveAll(trackList);
-                return objectMapper.writeValueAsString(savedTracks);
+                return objectMapper.writeValueAsString(trackList);
             }
         }
         return null;

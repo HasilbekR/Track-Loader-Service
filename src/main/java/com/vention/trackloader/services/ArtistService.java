@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ArtistService {
     private final ArtistRepository artistRepository = new ArtistRepositoryImpl();
@@ -36,8 +37,15 @@ public class ArtistService {
         return savedArtists;
     }
 
+    /**
+     * I clear 2 table here as tracks are linked to artists so without deleting them I cannot delete artists
+     * @param page - the page of data
+     * @return writes artists in json format
+     * @throws IOException -
+     */
     public String saveTopArtists(String page) throws IOException{
-        DatabaseUtils.clearDatabase();
+        DatabaseUtils.clearTrackTable();
+        DatabaseUtils.clearArtistTable();
         String apiUrl = Utils.getUrl()+"&method=chart.gettopartists"+"&page="+page;
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -54,8 +62,15 @@ public class ArtistService {
         }
         return null;
     }
+    public String getTopArtists() throws IOException {
+        List<Artist> artistList = artistRepository.getAll();
+        return objectMapper.writeValueAsString(artistList);
+    }
 
     public Artist getArtistByName(String name) {
         return artistRepository.getArtistByName(name);
+    }
+    public Artist getArtistById(UUID id){
+        return artistRepository.getArtistById(id);
     }
 }

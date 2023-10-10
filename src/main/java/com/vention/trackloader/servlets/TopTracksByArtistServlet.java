@@ -20,6 +20,6 @@ public class TopTracksByArtistServlet extends HttpServlet {
         if(!Objects.equals(service, "main")) throw new AccessDeniedException("Unavailable service" );
         String artist = req.getParameter("artist");
         String page = req.getParameter("page");
-        resp.getWriter().print(trackService.saveTopTracksByArtist(artist, page));
+        resp.getWriter().print(trackService.getTopTracksByArtist(artist, page));
     }
 }
