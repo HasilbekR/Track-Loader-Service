@@ -35,6 +35,7 @@ public class SecurityFilter implements Filter {
             response.getWriter().write(jsonResponse.toString());
         }
     }
+
     @Override
     public void destroy() {
         Filter.super.destroy();

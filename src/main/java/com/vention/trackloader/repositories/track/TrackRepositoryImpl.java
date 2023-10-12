@@ -17,10 +17,10 @@ public class TrackRepositoryImpl implements TrackRepository {
     public void save(Track track) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(INSERT);
-            PreparedStatement preparedStatement1 = DatabaseUtils.setValues(preparedStatement, track);
-            preparedStatement1.setInt(9, Objects.requireNonNullElse(track.getDuration(), 0));
-            preparedStatement1.setObject(10, track.getArtist().getId());
-            preparedStatement1.executeUpdate();
+            DatabaseUtils.setValues(preparedStatement, track);
+            preparedStatement.setInt(9, Objects.requireNonNullElse(track.getDuration(), 0));
+            preparedStatement.setObject(10, track.getArtist().getId());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -38,7 +38,7 @@ public class TrackRepositoryImpl implements TrackRepository {
 
     @Override
     public List<Track> getAll() {
-        try{
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Track> tracks = new LinkedList<>();

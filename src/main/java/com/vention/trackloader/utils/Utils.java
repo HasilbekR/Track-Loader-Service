@@ -57,7 +57,8 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
-    public static Boolean getRefresh(){
+
+    public static Boolean getRefresh() {
         try {
             Properties properties = new Properties();
             InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("application.properties");
@@ -69,8 +70,9 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
-    public static String getSchedulerTime(){
-        try{
+
+    public static String getSchedulerTime() {
+        try {
             Properties properties = new Properties();
             InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("application.properties");
             properties.load(inputStream);

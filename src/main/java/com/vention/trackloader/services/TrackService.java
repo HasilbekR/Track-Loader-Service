@@ -46,20 +46,21 @@ public class TrackService {
     /**
      * Despite clearing this table from artist service, I have to call it here too
      * as when the request comes from main service it calls directly this method
+     *
      * @param page-
      * @return writes tracks in json format
      * @throws IOException -
      */
     public String saveTopTracks(String page) throws IOException {
         DatabaseUtils.clearTrackTable();
-        String apiUrl = Utils.getUrl()+"&method=chart.gettoptracks&page="+page;
+        String apiUrl = Utils.getUrl() + "&method=chart.gettoptracks&page=" + page;
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
                 List<Track> trackList = trackWrapper.getTracks().getTrack();
                 List<Track> savedTracks = saveAll(trackList);
@@ -68,20 +69,22 @@ public class TrackService {
         }
         return null;
     }
+
     public String getTopTracks() throws IOException {
         List<Track> tracks = trackRepository.getAll();
         return objectMapper.writeValueAsString(tracks);
     }
+
     public String getTopTracksByArtist(String artist, String page) throws IOException {
         String encodedArtist = URLEncoder.encode(artist, StandardCharsets.UTF_8);
-        String apiUrl = Utils.getUrl()+"&method=artist.gettoptracks"+"&artist="+encodedArtist+"&page="+page;
+        String apiUrl = Utils.getUrl() + "&method=artist.gettoptracks" + "&artist=" + encodedArtist + "&page=" + page;
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
                 List<Track> trackList = trackWrapper.getToptracks().getTrack();
                 return objectMapper.writeValueAsString(trackList);
