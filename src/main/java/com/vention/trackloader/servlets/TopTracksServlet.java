@@ -8,8 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.util.Objects;
 
 @WebServlet(urlPatterns = "/track/save-top-tracks")
 public class TopTracksServlet extends HttpServlet {
@@ -17,13 +15,11 @@ public class TopTracksServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String service = req.getHeader("service");
-        if(!Objects.equals(service, "main")) throw new AccessDeniedException("Unavailable service" );
         String page = req.getParameter("page");
         if(Utils.getRefresh()){
-            resp.getWriter().print(trackService.getTopTracks());
-        }else {
             resp.getWriter().print(trackService.saveTopTracks(page));
+        }else {
+            resp.getWriter().print(trackService.getTopTracks());
         }
     }
 }

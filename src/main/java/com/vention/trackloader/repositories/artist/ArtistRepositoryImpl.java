@@ -1,17 +1,21 @@
 package com.vention.trackloader.repositories.artist;
 
 import com.vention.trackloader.models.artist.Artist;
+import com.vention.trackloader.utils.DatabaseUtils;
 import com.vention.trackloader.utils.ResultSetMapper;
 import com.vention.trackloader.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 public class ArtistRepositoryImpl implements ArtistRepository {
     private final Connection connection = Utils.getConnection();
+    private static final Logger log = LoggerFactory.getLogger(ArtistRepositoryImpl.class);
+
 
     @Override
     public Artist getArtistByName(String name) {
@@ -23,7 +27,7 @@ public class ArtistRepositoryImpl implements ArtistRepository {
                 return ResultSetMapper.mapArtist(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while retrieving artist by name: " + name, e);
         }
         return null;
     }
@@ -38,7 +42,7 @@ public class ArtistRepositoryImpl implements ArtistRepository {
                 return ResultSetMapper.mapArtist(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while retrieving artist", e);
         }
         return null;
     }
@@ -46,34 +50,13 @@ public class ArtistRepositoryImpl implements ArtistRepository {
     @Override
     public void save(Artist artist) {
         try {
-            PreparedStatement preparedStatement = save(connection, INSERT, artist.getId(), artist.getCreatedDate(), artist.getUpdatedDate(), artist.getIsBlocked(), artist.getName(), artist.getUrl(), artist.getPlaycount(), artist.getListeners());
-            preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT);
+            PreparedStatement preparedStatement1 = DatabaseUtils.setValues(preparedStatement, artist);
+            preparedStatement1.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
-    public static PreparedStatement save(Connection connection, String insert, UUID id, LocalDateTime createdDate, LocalDateTime updatedDate, Boolean isBlocked, String name, String url, Integer playcount, Integer listeners) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(insert);
-        preparedStatement.setObject(1, id);
-        preparedStatement.setObject(2, createdDate);
-        preparedStatement.setObject(3, updatedDate);
-        preparedStatement.setBoolean(4, isBlocked);
-        preparedStatement.setString(5, name);
-        preparedStatement.setString(6, url);
-        if(playcount != null){
-            preparedStatement.setInt(7, playcount);
-        }else{
-            preparedStatement.setNull(7,Types.INTEGER);
-        }
-        if(listeners != null){
-            preparedStatement.setInt(8, listeners);
-        }else {
-            preparedStatement.setNull(8, Types.INTEGER);
-        }
-        return preparedStatement;
-    }
-
     @Override
     public void deleteAll() {
         try {

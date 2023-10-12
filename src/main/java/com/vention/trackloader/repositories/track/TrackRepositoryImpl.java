@@ -1,7 +1,7 @@
 package com.vention.trackloader.repositories.track;
 
 import com.vention.trackloader.models.track.Track;
-import com.vention.trackloader.repositories.artist.ArtistRepositoryImpl;
+import com.vention.trackloader.utils.DatabaseUtils;
 import com.vention.trackloader.utils.ResultSetMapper;
 import com.vention.trackloader.utils.Utils;
 
@@ -16,10 +16,11 @@ public class TrackRepositoryImpl implements TrackRepository {
     @Override
     public void save(Track track) {
         try {
-            PreparedStatement preparedStatement = ArtistRepositoryImpl.save(connection, INSERT, track.getId(), track.getCreatedDate(), track.getUpdatedDate(), track.getIsBlocked(), track.getName(), track.getUrl(), track.getPlaycount(), track.getListeners());
-            preparedStatement.setInt(9, Objects.requireNonNullElse(track.getDuration(), 0));
-            preparedStatement.setObject(10, track.getArtist().getId());
-            preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT);
+            PreparedStatement preparedStatement1 = DatabaseUtils.setValues(preparedStatement, track);
+            preparedStatement1.setInt(9, Objects.requireNonNullElse(track.getDuration(), 0));
+            preparedStatement1.setObject(10, track.getArtist().getId());
+            preparedStatement1.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

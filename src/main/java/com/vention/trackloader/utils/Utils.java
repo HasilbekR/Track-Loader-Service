@@ -47,7 +47,7 @@ public class Utils {
     public static String getUrl() {
         try {
             Properties properties = new Properties();
-            InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("fm.properties");
+            InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("application.properties");
             properties.load(inputStream);
 
             String apiUrl = properties.getProperty("API_URL");
@@ -65,6 +65,16 @@ public class Utils {
 
             String refreshData = properties.getProperty("REFRESH_DATA");
             return Boolean.valueOf(refreshData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static String getSchedulerTime(){
+        try{
+            Properties properties = new Properties();
+            InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream("application.properties");
+            properties.load(inputStream);
+            return properties.getProperty("SCHEDULER_TIME");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
