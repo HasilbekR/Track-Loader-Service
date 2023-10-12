@@ -13,6 +13,7 @@ public interface TrackRepository {
     void save(Track track);
 
     void deleteAll();
+
     List<Track> getAll();
 
 }

@@ -16,9 +16,9 @@ public class TopTracksServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String page = req.getParameter("page");
-        if(Utils.getRefresh()){
+        if (Utils.getRefresh()) {
             resp.getWriter().print(trackService.saveTopTracks(page));
-        }else {
+        } else {
             resp.getWriter().print(trackService.getTopTracks());
         }
     }

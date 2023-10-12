@@ -39,21 +39,22 @@ public class ArtistService {
 
     /**
      * I clear 2 table here as tracks are linked to artists so without deleting them I cannot delete artists
+     *
      * @param page - the page of data
      * @return writes artists in json format
      * @throws IOException -
      */
-    public String saveTopArtists(String page) throws IOException{
+    public String saveTopArtists(String page) throws IOException {
         DatabaseUtils.clearTrackTable();
         DatabaseUtils.clearArtistTable();
-        String apiUrl = Utils.getUrl()+"&method=chart.gettopartists"+"&page="+page;
+        String apiUrl = Utils.getUrl() + "&method=chart.gettopartists" + "&page=" + page;
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 ArtistWrapper artistsWrapper = objectMapper.readValue(reader, ArtistWrapper.class);
                 List<Artist> artistList = artistsWrapper.getArtists().getArtist();
                 List<Artist> savedArtists = saveAll(artistList);
@@ -62,6 +63,7 @@ public class ArtistService {
         }
         return null;
     }
+
     public String getTopArtists() throws IOException {
         List<Artist> artistList = artistRepository.getAll();
         return objectMapper.writeValueAsString(artistList);
@@ -70,7 +72,8 @@ public class ArtistService {
     public Artist getArtistByName(String name) {
         return artistRepository.getArtistByName(name);
     }
-    public Artist getArtistById(UUID id){
+
+    public Artist getArtistById(UUID id) {
         return artistRepository.getArtistById(id);
     }
 }

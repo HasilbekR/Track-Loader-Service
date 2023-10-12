@@ -12,12 +12,14 @@ import java.util.UUID;
 
 public class ResultSetMapper {
     private final static ArtistService artistService = new ArtistService();
+
     public static Artist mapArtist(ResultSet resultSet) {
         Artist artist = new Artist();
         map(resultSet, artist);
         return artist;
     }
-    public static Track mapTrack(ResultSet resultSet){
+
+    public static Track mapTrack(ResultSet resultSet) {
         try {
             Track track = new Track();
             map(resultSet, track);
@@ -28,7 +30,8 @@ public class ResultSetMapper {
             throw new RuntimeException(e);
         }
     }
-    private static void map(ResultSet resultSet, BaseModel baseModel){
+
+    private static void map(ResultSet resultSet, BaseModel baseModel) {
         try {
             baseModel.setName(resultSet.getString("name"));
             baseModel.setUrl(resultSet.getString("url"));
@@ -40,7 +43,7 @@ public class ResultSetMapper {
             baseModel.setUpdatedDate(updatedDate.toLocalDateTime());
             baseModel.setIsBlocked(resultSet.getBoolean("is_blocked"));
             baseModel.setId(UUID.fromString(resultSet.getString("id")));
-            }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

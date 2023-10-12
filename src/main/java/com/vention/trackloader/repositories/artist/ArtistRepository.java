@@ -13,10 +13,12 @@ public interface ArtistRepository {
     String GET_ARTIST_BY_ID = "select * from artists where id = ?";
 
     Artist getArtistByName(String name);
+
     Artist getArtistById(UUID id);
 
     void save(Artist artist);
 
     void deleteAll();
+
     List<Artist> getAll();
 }

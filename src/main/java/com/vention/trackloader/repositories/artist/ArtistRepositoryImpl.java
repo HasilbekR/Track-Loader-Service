@@ -38,7 +38,7 @@ public class ArtistRepositoryImpl implements ArtistRepository {
             PreparedStatement preparedStatement = connection.prepareStatement(GET_ARTIST_BY_ID);
             preparedStatement.setObject(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 return ResultSetMapper.mapArtist(resultSet);
             }
         } catch (SQLException e) {
@@ -51,12 +51,13 @@ public class ArtistRepositoryImpl implements ArtistRepository {
     public void save(Artist artist) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(INSERT);
-            PreparedStatement preparedStatement1 = DatabaseUtils.setValues(preparedStatement, artist);
-            preparedStatement1.executeUpdate();
+            DatabaseUtils.setValues(preparedStatement, artist);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public void deleteAll() {
         try {
@@ -69,7 +70,7 @@ public class ArtistRepositoryImpl implements ArtistRepository {
 
     @Override
     public List<Artist> getAll() {
-        try{
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Artist> artists = new LinkedList<>();
