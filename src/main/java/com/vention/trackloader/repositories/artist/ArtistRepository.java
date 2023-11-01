@@ -1,24 +1,21 @@
 package com.vention.trackloader.repositories.artist;
 
-import com.vention.trackloader.models.artist.Artist;
+import com.vention.trackloader.domain.models.artist.Artist;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface ArtistRepository {
-    String GET_BY_NAME = "select * from artists where name = ?";
+    String GET_ARTIST = "select id as artist_id, created_date as artist_created_date, updated_date as artist_updated_date, name as artist_name, url as artist_url, playcount as artist_playcount, listeners as artist_listeners, is_blocked as artist_is_blocked from artists ";
+
     String INSERT = "insert into artists(id, created_date, updated_date, is_blocked, name, url, playcount, listeners) values(?,?,?,?,?,?,?,?)";
+    String GET_BY_NAME = GET_ARTIST + "where name = ?";
     String DELETE_ALL = "DELETE FROM artists";
-    String GET_ALL = "select * from artists";
-    String GET_ARTIST_BY_ID = "select * from artists where id = ?";
-
-    Artist getArtistByName(String name);
-
-    Artist getArtistById(UUID id);
 
     void save(Artist artist);
 
-    void deleteAll();
+    Artist getArtistByName(String name);
 
     List<Artist> getAll();
+
+    void deleteAll();
 }

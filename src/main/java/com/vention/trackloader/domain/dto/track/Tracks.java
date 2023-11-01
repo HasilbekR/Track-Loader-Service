@@ -1,6 +1,7 @@
-package com.vention.trackloader.models.track;
+package com.vention.trackloader.domain.dto.track;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vention.trackloader.domain.models.track.Track;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package com.vention.trackloader.models.artist;
+package com.vention.trackloader.domain.dto.artist;
 
 import lombok.Getter;
 import lombok.Setter;

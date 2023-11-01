@@ -5,20 +5,13 @@ import com.vention.trackloader.services.TrackService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 
-import java.io.IOException;
-
 public class LoadData implements Job {
-
     private final TrackService trackService = new TrackService();
     private final ArtistService artistService = new ArtistService();
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        try {
-            artistService.saveTopArtists("1");
-            trackService.saveTopTracks("1");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        artistService.saveTopArtists("1");
+        trackService.saveTopTracks("1");
     }
 }

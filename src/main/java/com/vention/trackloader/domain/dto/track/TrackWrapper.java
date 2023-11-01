@@ -1,4 +1,4 @@
-package com.vention.trackloader.models.track;
+package com.vention.trackloader.domain.dto.track;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -9,5 +9,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TrackWrapper {
     private Tracks tracks;
-    private TopTracks toptracks;
+    private Tracks toptracks;
 }

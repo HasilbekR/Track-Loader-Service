@@ -1,9 +1,9 @@
 package com.vention.trackloader.utils;
 
-import com.vention.trackloader.models.BaseModel;
-import com.vention.trackloader.models.artist.Artist;
-import com.vention.trackloader.models.track.Track;
-import com.vention.trackloader.services.ArtistService;
+import com.vention.trackloader.domain.models.artist.Artist;
+import com.vention.trackloader.domain.models.track.Track;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,40 +11,47 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 public class ResultSetMapper {
-    private final static ArtistService artistService = new ArtistService();
+    private static final Logger log = LoggerFactory.getLogger(ResultSetMapper.class);
 
     public static Artist mapArtist(ResultSet resultSet) {
-        Artist artist = new Artist();
-        map(resultSet, artist);
-        return artist;
+        try {
+            Artist artist = new Artist();
+            artist.setId(UUID.fromString(resultSet.getString("artist_id")));
+            Timestamp createdDate = resultSet.getTimestamp("artist_created_date");
+            artist.setCreatedDate(createdDate.toLocalDateTime());
+            Timestamp updatedDate = resultSet.getTimestamp("artist_updated_date");
+            artist.setUpdatedDate(updatedDate.toLocalDateTime());
+            artist.setIsBlocked(resultSet.getBoolean("artist_is_blocked"));
+            artist.setName(resultSet.getString("artist_name"));
+            artist.setUrl(resultSet.getString("artist_url"));
+            artist.setPlaycount(resultSet.getInt("artist_playcount"));
+            artist.setListeners(resultSet.getInt("artist_listeners"));
+            return artist;
+        } catch (SQLException e) {
+            log.error("Error occurred while mapping track", e);
+        }
+        return null;
     }
 
     public static Track mapTrack(ResultSet resultSet) {
         try {
             Track track = new Track();
-            map(resultSet, track);
+            track.setId(UUID.fromString(resultSet.getString("track_id")));
+            Timestamp createdDate = resultSet.getTimestamp("track_created_date");
+            track.setCreatedDate(createdDate.toLocalDateTime());
+            Timestamp updatedDate = resultSet.getTimestamp("track_updated_date");
+            track.setUpdatedDate(updatedDate.toLocalDateTime());
+            track.setIsBlocked(resultSet.getBoolean("track_is_blocked"));
+            track.setName(resultSet.getString("track_name"));
+            track.setUrl(resultSet.getString("track_url"));
+            track.setPlaycount(resultSet.getInt("track_playcount"));
+            track.setListeners(resultSet.getInt("track_listeners"));
             track.setDuration(resultSet.getInt("duration"));
-            track.setArtist(artistService.getArtistById((UUID) resultSet.getObject("artist_id")));
+            track.setArtist(mapArtist(resultSet));
             return track;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while mapping track", e);
         }
-    }
-
-    private static void map(ResultSet resultSet, BaseModel baseModel) {
-        try {
-            baseModel.setName(resultSet.getString("name"));
-            baseModel.setUrl(resultSet.getString("url"));
-            baseModel.setPlaycount(resultSet.getInt("playcount"));
-            baseModel.setListeners(resultSet.getInt("listeners"));
-            Timestamp createdDate = resultSet.getTimestamp("created_date");
-            baseModel.setCreatedDate(createdDate.toLocalDateTime());
-            Timestamp updatedDate = resultSet.getTimestamp("updated_date");
-            baseModel.setUpdatedDate(updatedDate.toLocalDateTime());
-            baseModel.setIsBlocked(resultSet.getBoolean("is_blocked"));
-            baseModel.setId(UUID.fromString(resultSet.getString("id")));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 }

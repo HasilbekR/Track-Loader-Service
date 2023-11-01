@@ -1,9 +1,9 @@
-package com.vention.trackloader.models.track;
+package com.vention.trackloader.domain.models.track;
 
-import com.vention.trackloader.models.artist.Artist;
+import com.vention.trackloader.domain.models.artist.Artist;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import com.vention.trackloader.models.BaseModel;
+import com.vention.trackloader.domain.models.BaseModel;
 
 @Getter
 @Setter

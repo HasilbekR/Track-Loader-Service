@@ -3,6 +3,7 @@ package com.vention.trackloader.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vention.trackloader.exceptions.BadRequestException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,7 @@ public class Utils {
                 Class.forName(DRIVER);
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             } catch (SQLException | ClassNotFoundException | IOException e) {
-                throw new RuntimeException(e);
+                throw new BadRequestException(e.getMessage());
             }
         }
         return connection;
@@ -54,7 +55,7 @@ public class Utils {
             String apiKey = properties.getProperty("API_KEY");
             return apiUrl + "&api_key=" + apiKey;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -67,7 +68,7 @@ public class Utils {
             String refreshData = properties.getProperty("REFRESH_DATA");
             return Boolean.valueOf(refreshData);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -78,7 +79,7 @@ public class Utils {
             properties.load(inputStream);
             return properties.getProperty("SCHEDULER_TIME");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 }
