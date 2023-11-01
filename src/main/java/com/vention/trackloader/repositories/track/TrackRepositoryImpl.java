@@ -1,9 +1,11 @@
 package com.vention.trackloader.repositories.track;
 
-import com.vention.trackloader.models.track.Track;
+import com.vention.trackloader.domain.models.track.Track;
 import com.vention.trackloader.utils.DatabaseUtils;
 import com.vention.trackloader.utils.ResultSetMapper;
 import com.vention.trackloader.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -12,6 +14,7 @@ import java.util.Objects;
 
 public class TrackRepositoryImpl implements TrackRepository {
     private final Connection connection = Utils.getConnection();
+    private static final Logger log = LoggerFactory.getLogger(TrackRepositoryImpl.class);
 
     @Override
     public void save(Track track) {
@@ -22,8 +25,24 @@ public class TrackRepositoryImpl implements TrackRepository {
             preparedStatement.setObject(10, track.getArtist().getId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while saving track", e);
         }
+    }
+
+    @Override
+    public List<Track> getAll() {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(GET_TRACKS);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Track> tracks = new LinkedList<>();
+            while (resultSet.next()) {
+                tracks.add(ResultSetMapper.mapTrack(resultSet));
+            }
+            return tracks;
+        } catch (SQLException e) {
+            log.error("Error occurred while retrieving tracks", e);
+        }
+        return null;
     }
 
     @Override
@@ -32,22 +51,7 @@ public class TrackRepositoryImpl implements TrackRepository {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Track> getAll() {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<Track> tracks = new LinkedList<>();
-            while (resultSet.next()) {
-                tracks.add(ResultSetMapper.mapTrack(resultSet));
-            }
-            return tracks;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred while deleting tracks", e);
         }
     }
 }

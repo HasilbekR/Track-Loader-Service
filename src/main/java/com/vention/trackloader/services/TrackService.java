@@ -1,13 +1,16 @@
 package com.vention.trackloader.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vention.trackloader.models.artist.Artist;
-import com.vention.trackloader.models.track.TrackWrapper;
+import com.vention.trackloader.exceptions.BadRequestException;
+import com.vention.trackloader.domain.models.artist.Artist;
+import com.vention.trackloader.domain.dto.track.TrackWrapper;
 import com.vention.trackloader.repositories.track.TrackRepository;
 import com.vention.trackloader.repositories.track.TrackRepositoryImpl;
 import com.vention.trackloader.utils.DatabaseUtils;
-import com.vention.trackloader.models.track.Track;
+import com.vention.trackloader.domain.models.track.Track;
 import com.vention.trackloader.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +26,7 @@ public class TrackService {
     private final TrackRepository trackRepository = new TrackRepositoryImpl();
     private final ObjectMapper objectMapper = Utils.getObjectMapper();
     private final ArtistService artistService = new ArtistService();
+    private static final Logger log = LoggerFactory.getLogger(TrackService.class);
 
     public Track save(Track track) {
         Artist artist = track.getArtist();
@@ -49,25 +53,29 @@ public class TrackService {
      *
      * @param page-
      * @return writes tracks in json format
-     * @throws IOException -
      */
-    public String saveTopTracks(String page) throws IOException {
+    public String saveTopTracks(String page) {
         DatabaseUtils.clearTrackTable();
         String apiUrl = Utils.getUrl() + "&method=chart.gettoptracks&page=" + page;
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
-                List<Track> trackList = trackWrapper.getTracks().getTrack();
-                List<Track> savedTracks = saveAll(trackList);
-                return objectMapper.writeValueAsString(savedTracks);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
+                    List<Track> trackList = trackWrapper.getTracks().getTrack();
+                    List<Track> savedTracks = saveAll(trackList);
+                    return objectMapper.writeValueAsString(savedTracks);
+                }
             }
+            return null;
+        } catch (IOException e) {
+            log.error("Error occurred while saving top tracks", e);
+            throw new BadRequestException(e.getMessage());
         }
-        return null;
     }
 
     public String getTopTracks() throws IOException {
@@ -78,19 +86,24 @@ public class TrackService {
     public String getTopTracksByArtist(String artist, String page) throws IOException {
         String encodedArtist = URLEncoder.encode(artist, StandardCharsets.UTF_8);
         String apiUrl = Utils.getUrl() + "&method=artist.gettoptracks" + "&artist=" + encodedArtist + "&page=" + page;
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
-                List<Track> trackList = trackWrapper.getToptracks().getTrack();
-                return objectMapper.writeValueAsString(trackList);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    TrackWrapper trackWrapper = objectMapper.readValue(reader, TrackWrapper.class);
+                    List<Track> trackList = trackWrapper.getToptracks().getTrack();
+                    return objectMapper.writeValueAsString(trackList);
+                }
             }
+            return null;
+        } catch (IOException e){
+            log.error("Error occurred while saving top tracks by artist", e);
+            throw new BadRequestException(e.getMessage());
         }
-        return null;
     }
 
 }

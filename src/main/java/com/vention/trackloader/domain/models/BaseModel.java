@@ -1,4 +1,4 @@
-package com.vention.trackloader.models;
+package com.vention.trackloader.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -23,8 +23,8 @@ public abstract class BaseModel {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     protected LocalDateTime updatedDate;
     protected Boolean isBlocked;
-    private String name;
-    private String url;
-    private Integer playcount;
-    private Integer listeners;
+    protected String name;
+    protected String url;
+    protected Integer playcount;
+    protected Integer listeners;
 }

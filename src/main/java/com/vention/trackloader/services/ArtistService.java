@@ -1,13 +1,17 @@
 package com.vention.trackloader.services;
 
 
-import com.vention.trackloader.models.artist.Artist;
-import com.vention.trackloader.models.artist.ArtistWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.vention.trackloader.exceptions.BadRequestException;
+import com.vention.trackloader.domain.models.artist.Artist;
+import com.vention.trackloader.domain.dto.artist.ArtistWrapper;
 import com.vention.trackloader.repositories.artist.ArtistRepository;
 import com.vention.trackloader.repositories.artist.ArtistRepositoryImpl;
 import com.vention.trackloader.utils.DatabaseUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vention.trackloader.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,11 +20,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ArtistService {
     private final ArtistRepository artistRepository = new ArtistRepositoryImpl();
     private final ObjectMapper objectMapper = Utils.getObjectMapper();
+    private static final Logger log = LoggerFactory.getLogger(ArtistService.class);
 
     public Artist save(Artist artist) {
         artistRepository.save(artist);
@@ -42,38 +46,43 @@ public class ArtistService {
      *
      * @param page - the page of data
      * @return writes artists in json format
-     * @throws IOException -
      */
-    public String saveTopArtists(String page) throws IOException {
+    public String saveTopArtists(String page) {
         DatabaseUtils.clearTrackTable();
         DatabaseUtils.clearArtistTable();
         String apiUrl = Utils.getUrl() + "&method=chart.gettopartists" + "&page=" + page;
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                ArtistWrapper artistsWrapper = objectMapper.readValue(reader, ArtistWrapper.class);
-                List<Artist> artistList = artistsWrapper.getArtists().getArtist();
-                List<Artist> savedArtists = saveAll(artistList);
-                return objectMapper.writeValueAsString(savedArtists);
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    ArtistWrapper artistsWrapper = objectMapper.readValue(reader, ArtistWrapper.class);
+                    List<Artist> artistList = artistsWrapper.getArtists().getArtist();
+                    List<Artist> savedArtists = saveAll(artistList);
+                    return objectMapper.writeValueAsString(savedArtists);
+                }
             }
+            return null;
+        } catch (IOException e) {
+            log.error("Error occurred while saving top artists", e);
+            throw new BadRequestException(e.getMessage());
         }
-        return null;
     }
 
-    public String getTopArtists() throws IOException {
+    public String getTopArtists(){
         List<Artist> artistList = artistRepository.getAll();
-        return objectMapper.writeValueAsString(artistList);
+        try {
+            return objectMapper.writeValueAsString(artistList);
+        } catch (JsonProcessingException e) {
+            log.error("Error occurred while retrieving top artists", e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     public Artist getArtistByName(String name) {
         return artistRepository.getArtistByName(name);
-    }
-
-    public Artist getArtistById(UUID id) {
-        return artistRepository.getArtistById(id);
     }
 }

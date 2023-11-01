@@ -1,5 +1,7 @@
 package com.vention.trackloader.filter;
 
+import com.vention.trackloader.exceptions.AccessRestrictedException;
+import com.vention.trackloader.exceptions.BadRequestException;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,20 +19,31 @@ public class SecurityFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        try{
         String serviceHeader = httpRequest.getHeader("service");
 
-        if ("main".equals(serviceHeader)) {
+        if (!"main".equals(serviceHeader)) {
+            throw new AccessRestrictedException("Access denied");
+        }
             chain.doFilter(request, response);
-        } else {
+        } catch (AccessRestrictedException e){
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
             httpResponse.setContentType("application/json");
 
             JSONObject jsonResponse = new JSONObject();
-            jsonResponse.put("error message", "Access Denied");
+            jsonResponse.put("error message", e.getMessage());
+
+            response.getWriter().write(jsonResponse.toString());
+        } catch (BadRequestException |  ServletException e){
+            httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            httpResponse.setContentType("application/json");
+
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("error message", e.getMessage());
 
             response.getWriter().write(jsonResponse.toString());
         }

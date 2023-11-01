@@ -1,15 +1,19 @@
 package com.vention.trackloader.scheduler;
 
+import com.vention.trackloader.exceptions.BadRequestException;
 import com.vention.trackloader.utils.Utils;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebListener
 public class Listener implements ServletContextListener {
     private Scheduler scheduler;
+    private static final Logger log = LoggerFactory.getLogger(Listener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -27,7 +31,8 @@ public class Listener implements ServletContextListener {
             scheduler.scheduleJob(job, trigger);
             scheduler.start();
         } catch (SchedulerException e) {
-            throw new RuntimeException("Error initializing Quartz Scheduler", e);
+            log.error("Error initializing Quartz Scheduler", e);
+            throw new BadRequestException(e.getMessage());
         }
     }
 
@@ -37,7 +42,8 @@ public class Listener implements ServletContextListener {
             try {
                 scheduler.shutdown(true);
             } catch (SchedulerException e) {
-                throw new RuntimeException("Error shutting down Quartz Scheduler", e);
+                log.error("Error shutting down Quartz Scheduler", e);
+                throw new BadRequestException(e.getMessage());
             }
         }
     }

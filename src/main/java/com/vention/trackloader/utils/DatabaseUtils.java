@@ -1,6 +1,6 @@
 package com.vention.trackloader.utils;
 
-import com.vention.trackloader.models.BaseModel;
+import com.vention.trackloader.domain.models.BaseModel;
 import com.vention.trackloader.repositories.artist.ArtistRepositoryImpl;
 import com.vention.trackloader.repositories.track.TrackRepository;
 import com.vention.trackloader.repositories.track.TrackRepositoryImpl;
@@ -39,6 +39,6 @@ public class DatabaseUtils {
         } else {
             preparedStatement.setNull(8, Types.INTEGER);
         }
-    }
+        }
 
 }
