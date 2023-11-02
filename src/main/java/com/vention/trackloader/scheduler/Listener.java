@@ -10,6 +10,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.TimeZone;
+
 @WebListener
 public class Listener implements ServletContextListener {
     private Scheduler scheduler;
@@ -25,7 +27,8 @@ public class Listener implements ServletContextListener {
             JobDetail job = JobBuilder.newJob(LoadData.class).build();
 
             Trigger trigger = TriggerBuilder.newTrigger()
-                    .withSchedule(CronScheduleBuilder.cronSchedule(updateAt))
+                    .withSchedule(CronScheduleBuilder.cronSchedule(updateAt)
+                            .inTimeZone(TimeZone.getTimeZone("Asia/Tashkent")))
                     .build();
 
             scheduler.scheduleJob(job, trigger);
